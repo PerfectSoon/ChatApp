@@ -1,23 +1,27 @@
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 import uvicorn
 import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from database.models import Base
-from database.connection import  engine, SessionLocal
+from database.connection import  engine
 from settings import settings
-from api.rest import router
+from api.routers.rest import router
+from api.routers.websocket import router1
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    db = SessionLocal()
-    yield db.close()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    yield
+
+    await engine.dispose()
 
 
 app = FastAPI(
@@ -25,6 +29,7 @@ app = FastAPI(
     description=settings.service_description,
     lifespan=lifespan
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,12 +40,17 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(router1)
+
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
 
 @app.get("/")
 def read_root():
-    return {"message": "Auth service is running"}
+    return {"message": f"{settings.service_name} is running"}
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    uvicorn.run("main:app", host="localhost", port=8000, reload=True)
+    uvicorn.run("main:app", host="localhost", port=8002, reload=True)

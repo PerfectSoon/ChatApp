@@ -29,7 +29,6 @@ class AuthService:
         return self.user_repository.create(user)
 
     def authenticate_user(self, user_data: UserAuth):
-
         user = self.user_repository.get_by_email(user_data.email)
         if not user:
             return None
@@ -38,9 +37,13 @@ class AuthService:
         return user
 
     def create_access_token(self, subject: str) -> str:
-        expire = datetime.utcnow() + timedelta(minutes=settings.expires_minutes)
+        expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
         payload = {"sub": subject, "exp": expire}
         token = jwt.encode(payload, self.settings.secret_key, algorithm=self.settings.algorithm)
         return token
 
-
+    def user_by_id(self, user_id:id):
+        user = self.user_repository.get_by_id(user_id)
+        if not user:
+            return None
+        return user

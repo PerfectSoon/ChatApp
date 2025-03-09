@@ -14,3 +14,6 @@ class UserRepository:
         self.db.refresh(user)
         return user
 
+    def get_by_id(self, id: int) -> User | None:
+        return self.db.query(User).filter(User.id == id).first()
+
