@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -6,6 +7,8 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 
 from database.models import Base
 from database.connection import  engine, SessionLocal
@@ -36,10 +39,17 @@ app.add_middleware(
 
 app.include_router(router)
 
-@app.get("/")
-def read_root():
-    return {"message": "Auth service is running"}
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse(url="/static/auth.html")
+
+@app.get("/auth/success")
+async def auth_success():
+    return RedirectResponse(url="http://localhost:8001/static/chat.html")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

@@ -4,11 +4,12 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.connection import get_db
-from database.schemas import ChatCreate, ChatOut, UserToChat, ChatMemberOut
+from database.schemas import ChatCreate, ChatOut, UserToChat, ChatMemberOut, MessageOut
 from database.repositories import ChatRepository, ChatMemberRepository,MessageRepository
 
 from services.chat import ChatService
 from services.chatmember import ChatMemberService
+from services.message import MessageService
 
 from api.depends import get_user_from_token
 
@@ -21,7 +22,8 @@ async def create_chat(
     user: dict = Depends(get_user_from_token),
     db: AsyncSession = Depends(get_db)
 ):
-    owner_id = user.get("user_id")
+    owner_id = int(user.get("user_id"))
+    print(type(owner_id))
     if not owner_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -39,7 +41,7 @@ async def get_user_chats(
     user: dict = Depends(get_user_from_token),
     db: AsyncSession = Depends(get_db)
 ):
-    user_id = user.get("user_id")
+    user_id = int(user.get("user_id"))
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -61,7 +63,7 @@ async def add_user_to_chat(
         service = ChatMemberService(memrepo=mem_repo)
         chat_member = await service.add_user_to_chat(
             chat_id=data.chat_id,
-            user_id=data.user_id
+            user_id=int(data.user_id)
         )
 
         return chat_member
@@ -78,7 +80,7 @@ async def delete_user_from_chat(
         service = ChatMemberService(memrepo=mem_repo)
         chat_member = await service.remove_user_from_chat(
             chat_id=data.chat_id,
-            user_id=data.user_id
+            user_id=int(data.user_id)
         )
 
         return chat_member
@@ -96,3 +98,22 @@ async def delete_chat(
     chat = await chatservice.delete_chat(chat_id=chat_id)
 
     return chat
+
+
+@router.get("/{chat_id}/messages", response_model=List[MessageOut])
+async def get_messages_on_chat(
+    chat_id: int,
+    current_user: dict = Depends(get_user_from_token),
+    db: AsyncSession = Depends(get_db)
+):
+    user_id = int(current_user.get("user_id"))
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="user_id not found in token"
+        )
+    mess_repo = MessageRepository(db)
+    service = MessageService(messagerepo=mess_repo)
+    messages = await service.get_chat_messages(chat_id=chat_id)
+
+    return messages

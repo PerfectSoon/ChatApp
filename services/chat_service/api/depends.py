@@ -21,7 +21,7 @@ def get_user_from_token(token: str = Depends(oauth2_scheme)):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token payload"
             )
-        return {"user_id": user_id}
+        return {"user_id": int(user_id)}
     except JWTError:
         raise HTTPException(401, "Invalid token")
 

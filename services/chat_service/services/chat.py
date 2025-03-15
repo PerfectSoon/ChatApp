@@ -17,11 +17,11 @@ class ChatService:
         chat = Chat(
             type=chat_data.type,
             name=chat_data.name,
-            owner_id=owner_id
+            owner_id=int(owner_id)
         )
         created_chat = await self.chatrepo.create(chat=chat)
         if self.memrepo:
-            chat_member = ChatMember(chat_id=created_chat.id, user_id=owner_id, role="admin")
+            chat_member = ChatMember(chat_id=created_chat.id, user_id=int(owner_id), role="admin")
             await self.memrepo.create(chat_member=chat_member)
         return created_chat
 

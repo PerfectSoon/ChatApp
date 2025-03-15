@@ -20,6 +20,7 @@ class ChatMemberService:
 
         if chat.type == "private":
             members = await self.memrepo.get_chat_members(chat_id)
+
             if len(members) >= 2:
                 raise HTTPException(400, "Private chat can only have 2 members")
 
@@ -30,7 +31,7 @@ class ChatMemberService:
         if existing_member:
             raise HTTPException(400, "User is already a member of this chat")
 
-        chat_member = ChatMember(chat_id=chat_id, user_id=user_id, role="member")
+        chat_member = ChatMember(chat_id=chat_id, user_id=int(user_id), role="member")
         return await self.memrepo.create(chat_member=chat_member)
 
     async def remove_user_from_chat(self, chat_id: int, user_id: int) :
@@ -47,4 +48,6 @@ class ChatMemberService:
 
         return member
 
+    async def get_user(self, chat_id: int, user_id: int):
+            return await self.memrepo.get_member(chat_id, user_id)
 

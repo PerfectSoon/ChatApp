@@ -38,13 +38,15 @@ class BaseRepository:
 
 class ChatRepository(BaseRepository):
     async def get_user_chats(self, user_id: int) -> List[Chat]:
-        query = select(Chat).join(Chat.members).where(ChatMember.user_id == user_id)
+        query = select(Chat).join(ChatMember).where(ChatMember.user_id == user_id)
         return await self._execute_query(query)
 
     async def create(self, chat: Chat) -> Chat:
-        return await self._add(chat)
+        chat = await self._add(chat)
+        await self._commit()
+        return chat
 
-    async def delete(self, chat_id: id) -> Chat:
+    async def delete(self, chat_id: int) -> Chat:
         chat = await self._get_by_id(Chat, chat_id)
         return await self._delete(chat)
 
@@ -74,8 +76,6 @@ class ChatMemberRepository(BaseRepository):
         return await self._delete(member)
 
 
-
-
 class MessageRepository(BaseRepository):
     async def create(self, message: Message) -> Message:
         return await self._add(message)
@@ -87,7 +87,7 @@ class MessageRepository(BaseRepository):
         query = select(Message).where(Message.chat_id == chat_id)
         return await self._execute_query(query)
 
-    async def delete(self, message_id: id) -> Message:
+    async def delete(self, message_id: int) -> Message:
         message = await self._get_by_id(Message,message_id)
         return await self._delete(message)
 

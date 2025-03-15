@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -6,6 +7,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 
 from database.models import Base
 from database.connection import  engine
@@ -42,15 +44,9 @@ app.add_middleware(
 app.include_router(router)
 app.include_router(router1)
 
-
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
-
-@app.get("/")
-def read_root():
-    return {"message": f"{settings.service_name} is running"}
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    uvicorn.run("main:app", host="localhost", port=8002, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

@@ -41,11 +41,21 @@ def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = auth_service.create_access_token(subject=str(auth_user.id))
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token,
+            "token_type": "bearer"
+            }
 
 @router.get("/profile", response_model=UserOut)
-def get_profile(current_user: User = Depends(get_current_user)):
-    return current_user
+def get_profile(
+        current_user: int = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    user_repo = UserRepository(db)
+    service = AuthService(user_repository=user_repo, settings=settings)
+    user = service.user_by_id(int(current_user))
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 @router.get("/profile/{user_id}", response_model=UserOut)
 def get_profile_by_id(

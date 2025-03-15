@@ -9,18 +9,14 @@ from settings import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-def get_current_user(token: User = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(token: User = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        user = payload.get("sub")
-        if user is None:
+        user_id = payload.get("sub")
+        if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
+        return user_id
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = db.query(User).filter(User.id == user.id).first()
-    if user is None:
-        raise HTTPException(status_code=401, detail="User not found")
-
-    return user
 

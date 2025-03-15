@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мессенджер</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/chat.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="user-profile">
+                <div class="user-info">
+                    <h3 id="user-name">Загрузка...</h3>
+                    <p id="user-email">Загрузка...</p>
+                </div>
+                <button id="logout-btn" class="btn btn-small">Выйти</button>
+            </div>
+            <div class="chat-list-header">
+                <h3>Chats</h3>
+                <button id="new-chat-btn" class="btn btn-small">Новый чат</button>
+            </div>
+            <div class="chat-list" id="chat-list">
+                <!-- Chat list will be populated dynamically -->
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="chat-container" id="chat-container">
+                <div class="chat-header">
+                    <h2 id="current-chat-name">Выбрать чат</h2>
+                    <div class="chat-actions">
+                        <button id="add-user-btn" class="btn btn-small">Добавить пользователя</button>
+                        <button id="delete-chat-btn" class="btn btn-small btn-danger">Удалить чат</button>
+                    </div>
+                </div>
+
+                <div class="messages-container" id="messages-container">
+                    <!-- Messages will be populated dynamically -->
+                    <div class="no-chat-selected">
+                        <p>Выберите чат или создайте новый</p>
+                    </div>
+                </div>
+
+                <div class="message-input-container">
+                    <textarea id="message-input" placeholder="Type a message..." disabled></textarea>
+                    <button id="send-message-btn" class="btn btn-primary" disabled>Отправить</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="new-chat-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Создать чат</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="create-chat-form">
+                    <div class="form-group">
+                        <label for="chat-name">Имя чата</label>
+                        <input type="text" id="chat-name" name="chat-name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Создать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Добавить пользователя в чат</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-user-form">
+                    <div class="form-group">
+                        <label for="user-id">User ID</label>
+                        <input type="number" id="user-id" name="user-id" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Добавить пользователя</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/chat.js"></script>
+    <script src="js/websocket.js"></script>
+</body>
+</html>

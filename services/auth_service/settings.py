@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     service_name: str = "auth_service"
     service_description: str = "Authentication microservice"
-    database_url: str = "sqlite:///./auth.db"
+    database_url: str = "postgresql://user1:password1@postgres_service1:5432/auth_db"
     secret_key: str = 'SUPER_SECRET_KEY'
     algorithm: str = 'HS256'
     access_token_expire_minutes: int = 1800
