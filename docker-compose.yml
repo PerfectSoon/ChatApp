@@ -2,54 +2,59 @@ services:
   postgres_service1:
     image: postgres:latest
     container_name: postgres_service1
+    env_file:
+      - ./services/auth_service/.env
     environment:
-      POSTGRES_DB: auth_db
-      POSTGRES_USER: user1
-      POSTGRES_PASSWORD: password1
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data1:/var/lib/postgresql/data
-    restart: always
-
 
   postgres_service2:
     image: postgres:latest
     container_name: postgres_service2
+    env_file:
+      - ./services/chat_service/.env
     environment:
-      POSTGRES_DB: chat_db
-      POSTGRES_USER: user2
-      POSTGRES_PASSWORD: password2
+      POSTGRES_DB: ${CHAT_DB_NAME}
+      POSTGRES_USER: ${CHAT_DB_USER}
+      POSTGRES_PASSWORD: ${CHAT_DB_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - postgres_data2:/var/lib/postgresql/data
-    restart: always
 
   auth-service:
     build: ./services/auth_service
     container_name: auth
-    ports:
-      - "8000:8000"
+    env_file:
+      - ./services/auth_service/.env
     environment:
       PORT: 8000
+      DB_HOST: ${AUTH_DB_HOST}
+      DB_NAME: ${AUTH_DB_NAME}
+      DB_USER: ${AUTH_DB_USER}
+      DB_PASSWORD: ${AUTH_DB_PASSWORD}
     depends_on:
       - postgres_service1
-    restart: always
 
   chat-service:
     build: ./services/chat_service
     container_name: chat
-    ports:
-      - "8001:8001"
+    env_file:
+      - ./services/chat_service/.env
     environment:
       PORT: 8001
+      DB_HOST: ${CHAT_DB_HOST}
+      DB_NAME: ${CHAT_DB_NAME}
+      DB_USER: ${CHAT_DB_USER}
+      DB_PASSWORD: ${CHAT_DB_PASSWORD}
     depends_on:
       - postgres_service2
-    restart: always
-
 
 volumes:
   postgres_data1:
   postgres_data2:
-

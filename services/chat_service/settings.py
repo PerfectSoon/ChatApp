@@ -4,8 +4,8 @@ class Settings(BaseSettings):
     service_name: str = "chat_service"
     service_description: str = "Chat microservice"
     database_url: str = "postgresql+asyncpg://user2:password2@postgres_service2:5432/chat_db"
-    secret_key: str = 'SUPER_SECRET_KEY'
-    algorithm: str = 'HS256'
+    secret_key: str
+    algorithm: str
 
 
     model_config = SettingsConfigDict(
